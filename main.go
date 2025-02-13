@@ -1,17 +1,21 @@
 package main
 
 import (
-	"os"
-	"log"
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
-	"github.com/joho/godotenv"
+	"os"
+	"github.com/amanraj8848/rssScrapper/internal/database"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
-	"database/sql"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
+type apiConfig struct {
+	DB *database.Queries
+}
 func main() {
 	godotenv.Load()
 
@@ -35,7 +39,9 @@ func main() {
 	}
 
 	fmt.Println("Successfully connected to PostgreSQL!")
-
+	apiCfg := apiConfig{
+		DB: database.New(db), // Corrected assignment to use *sql.DB
+	}
 
 	router := chi.NewRouter()
 
@@ -50,11 +56,11 @@ func main() {
 
 	v1Router := chi.NewRouter()
 	router.Mount("/v1", v1Router)
-	
-	 v1Router.Get("/check", handerReadiness)
-	 v1Router.Get("/err",handlerErr)
-	
-	
+
+	v1Router.Get("/check", handlerReadiness) // Corrected typo in handler name
+	v1Router.Get("/err", handlerErr)        // Corrected typo in handler name
+	v1Router.Post("/user", apiCfg.handlerCreateUser)
+
 	srv := &http.Server{
 		Handler: router,
 		Addr:    ":" + portString,
@@ -65,6 +71,5 @@ func main() {
 	if err2 != nil {
 		log.Fatal(err2)
 	}
-
 }
 
