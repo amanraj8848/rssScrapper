@@ -39,7 +39,7 @@ func main() {
 	}
 
 	fmt.Println("Successfully connected to PostgreSQL!")
-	apiCfg := apiConfig{
+		apiCfg := apiConfig{
 		DB: database.New(db), // Corrected assignment to use *sql.DB
 	}
 
@@ -60,6 +60,8 @@ func main() {
 	v1Router.Get("/check", handlerReadiness) // Corrected typo in handler name
 	v1Router.Get("/err", handlerErr)        // Corrected typo in handler name
 	v1Router.Post("/user", apiCfg.handlerCreateUser)
+	v1Router.Get("/user", apiCfg.handlerGetUser)
+
 
 	srv := &http.Server{
 		Handler: router,
