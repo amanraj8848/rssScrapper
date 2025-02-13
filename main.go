@@ -60,7 +60,7 @@ func main() {
 	v1Router.Get("/check", handlerReadiness) // Corrected typo in handler name
 	v1Router.Get("/err", handlerErr)        // Corrected typo in handler name
 	v1Router.Post("/user", apiCfg.handlerCreateUser)
-	v1Router.Get("/user", apiCfg.middlewareAuth(apiCfg.handlerGetUser))
+	v1Router.Get("/user", apiCfg.middlewareAuth(apiCfg.handlerGetUserByAPIKey))
 
 
 	srv := &http.Server{

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/amanraj8848/rssScrapper/internal/database"
-	"github.com/amanraj8848/rssScrapper/internal/auth"
 )
 func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	// Read the request body into a json decoder
@@ -38,6 +37,6 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 
 	respondWithJSON(w, 201, databaseUserToUser(user))
 }
-func (apiCfg *apiConfig) handlerGetUser	(w http.ResponseWriter, r *http.Request, user database.User) {
-	respondWithJSON(w, 200, databaseUserToUser(user))
+func (apiCfg *apiConfig) handlerGetUserByAPIKey	(w http.ResponseWriter, r *http.Request, user database.User) {
+	respondWithJSON(w, 200, (user))
 }
