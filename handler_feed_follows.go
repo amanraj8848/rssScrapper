@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
-
 	"github.com/go-chi/chi"
+	"time"
 	"github.com/google/uuid"
 	"github.com/amanraj8848/rssScrapper/internal/database"
 )
@@ -41,39 +40,30 @@ func (apiCfg *apiConfig) handlerCreateFeedFollow(w http.ResponseWriter, r *http.
 
 	respondWithJSON(w, 201, databaseFeedFollowToFeedFollow(feedFollow))
 }
-
 func (apiCfg *apiConfig) handlerGetFeedFollows(w http.ResponseWriter, r *http.Request, user database.User) {
-
+	
 	feedFollows, err := apiCfg.DB.GetFeedFollows(r.Context(), user.ID)
-
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldnt get feed_follow: ", err))
+		respondWithError(w, 400, fmt.Sprintf("Couldnt get Feed Follows: ", err))
 		return
 	}
 
-	respondWithJSON(w, 201, database.ToFeedFollowDtos(feedFollows))
+	respondWithJSON(w, 201, databaseFeedFollowsToFeedFollows(feedFollows))
 }
-
-func (apiCfg *apiConfig) handlerUnfollowFeed(w http.ResponseWriter, r *http.Request, user database.User) {
-	feedFollowIDParam := chi.URLParam(r, "feedFollowID")
-
-	feedFollowID, err := uuid.Parse((feedFollowIDParam))
-
+func (apiCfg *apiConfig) handlerDeleteFeedFollows(w http.ResponseWriter, r *http.Request, user database.User) {
+	feedFollowStr := chi.URLParam(r,"feed_follow_id")
+	feedFollowId, err := uuid.Parse(feedFollowStr)
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldnt parse feed follow id: ", err))
+		respondWithError(w, 400, fmt.Sprintf("Couldnt get parse feed follow id: ", err))
 		return
 	}
-
-	// Not returning error if feed is not followed - TODO
-	err = apiCfg.DB.UnfollowFeed(r.Context(), database.UnfollowFeedParams{
-		ID:     feedFollowID,
+	err = apiCfg.DB.DeleteFeedFollow(r.Context(), database.DeleteFeedFollowParams{
+		ID:     feedFollowId,
 		UserID: user.ID,
 	})
-
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldnt unfollow feed: ", err))
+		respondWithError(w, 400, fmt.Sprintf("Couldnt delete Feed Follows: ", err))
 		return
 	}
-
-	respondWithJSON(w, 200, struct{}{})
+	respondWithJSON(w,200, struct{}{})
 }
