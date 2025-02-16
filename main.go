@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 	"github.com/amanraj8848/rssScrapper/internal/database"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
@@ -22,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(feed)
-	
+
 	godotenv.Load()
 
 	portString := os.Getenv("PORT")
@@ -33,22 +34,23 @@ func main() {
 	if DB_URL == "" {
 		log.Fatal("DB_URL is not found in .env")
 	}
-	db, err := sql.Open("postgres", DB_URL)
+	conn, err := sql.Open("postgres", DB_URL)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	defer conn.Close()
 	// Check if the connection is successful
-	err = db.Ping()
+	err = conn.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	db :=database.New(conn)
 	fmt.Println("Successfully connected to PostgreSQL!")
 		apiCfg := apiConfig{
-		DB: database.New(db), // Corrected assignment to use *sql.DB
+		DB: db, // Corrected assignment to use *sql.DB
 	}
 
+	go startScraping(db, 10, time.Minute)
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{

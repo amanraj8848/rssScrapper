@@ -8,10 +8,10 @@ VALUES ($1,$2,$3,$4,$5,$6)
 SELECT * FROM feeds;
 
 
--- name: GetNextFeedToFetch :one
+-- name: GetNextsFeedToFetch :many
 SELECT * FROM feeds 
 ORDER BY last_fetched_at ASC NULLS FIRST
-LIMIT 1;
+LIMIT $1;
 
 
 -- name: MarkFeedAsFetched :one
