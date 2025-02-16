@@ -40,3 +40,14 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 func (apiCfg *apiConfig) handlerGetUserByAPIKey	(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, 200, (user))
 }
+func (apiCfg *apiConfig) handlerGetPostsForUser	(w http.ResponseWriter, r *http.Request, user database.User) {
+	post,err := apiCfg.DB.GetPostsForUser(r.Context(), database.GetPostsForUserParams{
+		UserID: user.ID,
+		Limit: 10,
+	})
+	if err!= nil{
+		respondWithError(w, 400, fmt.Sprintf("Couldn't get posts for user: %v", err))
+		return
+	}
+	respondWithJSON(w, 200, databasePostsToPosts(post))
+}

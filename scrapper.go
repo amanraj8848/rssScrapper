@@ -13,12 +13,12 @@ import (
 
 func startScraping(db *database.Queries,concurrency int,timeBetweenRequest time.Duration,) {
 
-	log.Printf("Scraping on %v goroutines every %s duration",concurrency,timeBetweenRequest)
+	log.Printf("Scraping on %v goroutines every %v duration",concurrency,timeBetweenRequest)
 	ticker := time.NewTicker(timeBetweenRequest)
 
 	// Run this loop every one minute
 	for ; ; <-ticker.C {
-		feeds, err := db.GetNextFeedsToFetch(
+		feeds, err := db.GetNextsFeedToFetch(
 			context.Background(),
 			int32(concurrency),
 		)
@@ -45,7 +45,7 @@ func scrapeFeed(
 	feed database.Feed) {
 	defer waitGroup.Done() // Decrements counter by 1
 
-	_, err := db.MarkFeedFetched(context.Background(), feed.ID)
+	_, err := db.MarkFeedAsFetched(context.Background(), feed.ID)
 
 	if err != nil {
 		log.Printf("Error marking feed as fetched: ", err)
